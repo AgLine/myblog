@@ -2,12 +2,6 @@ spring:
   application:
     name: myblog
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: myuser
-    password: mypass
-    driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
