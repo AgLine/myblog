@@ -1,14 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Login() {
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    // 로그인 로직 처리
-    console.log('로그인 시도');
-  };
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await axios.post('http://localhost:9090/auth/login', {
+      email,
+      password
+    });
+
+    console.log('응답:', response.data); // 예: { token: true }
+
+    if (response.data.token) {
+      // 토큰이 실제 토큰이면 localStorage에 저장
+      // localStorage.setItem('token', response.data.token);
+      navigate('/home'); // 예시: 로그인 후 이동할 페이지
+    } else {
+      alert('로그인 실패');
+    }
+  } catch (error) {
+    alert('로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.');
+  }
+};
 
   const handleGoogleLogin = () => {
     // 구글 로그인 연동
@@ -21,9 +42,9 @@ function Login() {
         <h2 style={styles.title}>로그인</h2>
         <form onSubmit={handleLogin}>
           <label style={styles.label}>이메일</label>
-          <input type="email" placeholder="you@example.com" required style={styles.input}/>
+          <input type="email" placeholder="you@example.com" required style={styles.input} value={email} onChange={(e) => setEmail(e.target.value)}/>
           <label style={styles.label}>비밀번호</label>
-          <input type="password" placeholder="••••••••" required style={styles.input} />
+          <input type="password" placeholder="••••••••" required style={styles.input} value={password} onChange={(e) => setPassword(e.target.value)}/>
           <button type="submit" style={styles.loginButton}>로그인</button>
         </form>
 

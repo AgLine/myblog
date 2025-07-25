@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function SignUp() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState('');
   const [isEmailChecked, setIsEmailChecked] = useState(false);
   const [isEmailAvailable, setIsEmailAvailable] = useState(null);
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [nickname, setNickname] = useState('');
 
   const handleEmailCheck = async () => {
     try {
-      const response = await axios.get(`http://localhost:9090/api/users/check-email?email=${email}`);
+      const response = await axios.get(`http://localhost:9090/auth/validateEmail`, {
+      params: { email },
+      });
       setIsEmailChecked(true);
       setIsEmailAvailable(response.data.available);
     } catch (error) {
@@ -22,6 +26,7 @@ function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (!isEmailAvailable) {
       alert('이메일 중복 확인이 필요하거나 이미 사용 중입니다.');
       return;
@@ -30,14 +35,18 @@ function SignUp() {
       alert('비밀번호가 일치하지 않습니다.');
       return;
     }
-
+   
     try {
-      await axios.post('http://localhost:9090/api/users/signup', {
+      const response = await axios.post('http://localhost:9090/auth/signup', {
         email,
-        password,
-        nickname,
+        password
       });
-      alert('회원가입 성공!');
+      if (response.data === 'success') {
+        alert('회원가입 성공!');
+        navigate('/Login'); // 로그인 페이지로 이동
+      }else{
+        alert('회원가입 실패: ' + response.data);
+      }
     } catch (error) {
       alert('회원가입 실패');
       console.error(error);
@@ -105,18 +114,6 @@ function SignUp() {
               {password === confirmPassword ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.'}
             </div>
           )}
-        </div>
-
-        {/* 닉네임 입력 */}
-        <div style={styles.fieldWrapper}>
-          <label style={styles.label}>닉네임</label>
-          <input
-            type="text"
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            style={styles.input}
-            required
-          />
         </div>
 
         <button type="submit" style={styles.submitButton}>가입하기</button>
