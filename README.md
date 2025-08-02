@@ -4,6 +4,7 @@ Markdown 기반의 작가 중심 글쓰기 기능과 GPT API를 활용한 자동
 ### Backend
 - **Java 17**, **Spring Boot**
 - **Spring Security + JWT** (인가/인증 분리)
+- **Google OAuth2 Login** (소셜 로그인 연동)
 - **JPA (Hibernate)**, PostgreSQL
 - Swagger (API 문서화)
 - GPT API연동 (글 요약/제목 생성)
@@ -13,5 +14,3 @@ Markdown 기반의 작가 중심 글쓰기 기능과 GPT API를 활용한 자동
 - Jenkins
 - Docker
 - Kubernetes (배포 자동화 구성 중)
-
-  
