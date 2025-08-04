@@ -45,4 +45,17 @@ public class AuthCtrl {
 
         return ResponseEntity.ok(Map.of("token", token));
     }
+
+    @PostMapping("/google")
+    public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> body) {
+        String idToken = body.get("token");
+
+        String jwt = authSvc.loginWithGoogle(idToken);
+        //System.out.println(jwt);
+        if (jwt == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Google 로그인 실패");
+        }
+
+        return ResponseEntity.ok(Map.of("token", jwt));
+    }
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 
 function Login() {
   const navigate = useNavigate();
@@ -8,32 +9,49 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // 일반 로그인 처리
   const handleLogin = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const response = await axios.post('http://localhost:9090/auth/login', {
-      email,
-      password
-    });
+    try {
+      const response = await axios.post('http://localhost:9090/auth/login', {
+        email,
+        password
+      });
 
-    console.log('응답:', response.data); // 예: { token: true }
+      console.log('응답:', response.data); // 예: { token: true }
 
-    if (response.data.token) {
-      // 토큰이 실제 토큰이면 localStorage에 저장
-      // localStorage.setItem('token', response.data.token);
-      navigate('/home'); // 예시: 로그인 후 이동할 페이지
-    } else {
-      alert('로그인 실패');
+      if (response.data.token) {
+        // 토큰이 실제 토큰이면 localStorage에 저장
+        localStorage.setItem('token', response.data.token);
+        navigate('/home'); // 예시: 로그인 후 이동할 페이지
+      } else {
+        alert('로그인 실패');
+      }
+    } catch (error) {
+      alert('로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.');
     }
-  } catch (error) {
-    alert('로그인 실패: 이메일 또는 비밀번호가 일치하지 않습니다.');
-  }
-};
+  };
 
-  const handleGoogleLogin = () => {
-    // 구글 로그인 연동
-    console.log('Google 로그인 시도');
+  // Google 로그인 성공 처리
+  const handleGoogleLoginSuccess = async (credentialResponse) => {
+    try {
+      const { credential } = credentialResponse;
+
+      // Google에서 받은 credential(JWT)을 백엔드로 전달
+      const response = await axios.post('http://localhost:9090/auth/google', {
+        token: credential,
+      });
+
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        navigate('/home');
+      } else {
+        alert('Google 로그인 실패');
+      }
+    } catch (err) {
+      alert('Google 로그인 중 오류가 발생했습니다');
+    }
   };
 
   return (
@@ -50,9 +68,11 @@ function Login() {
 
         <div style={styles.separator}>또는</div>
 
-        <button onClick={handleGoogleLogin} style={styles.googleButton}>
-          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={styles.googleLogo}/>Google로 로그인
-        </button>
+        {/* Google 로그인 버튼 추가 */}
+        <GoogleOAuthProvider clientId="433451591816-rt2olvmo0ghreepvil468pikvp38c2dp.apps.googleusercontent.com">
+          <GoogleLogin onSuccess={handleGoogleLoginSuccess} onError={() => alert('Google 로그인 실패')}
+        />
+        </GoogleOAuthProvider>
 
         <div style={styles.signup}>
           계정이 없으신가요?{' '}
@@ -156,4 +176,5 @@ const styles = {
     paddingLeft: '4px',
   },
 };
+
 export default Login;

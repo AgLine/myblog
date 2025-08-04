@@ -9,5 +9,7 @@ public interface AuthSvc {
     public boolean validateEmail(String email);
     //로그인
     public String login(SignupRequestDto dto);
+    //구글로그인
+    String loginWithGoogle(String idToken);
 
 }
