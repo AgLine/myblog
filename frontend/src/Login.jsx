@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 
-function Login() {
+
+function Login({ onLogin }) {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -12,19 +13,18 @@ function Login() {
   // 일반 로그인 처리
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
       const response = await axios.post('http://localhost:9090/auth/login', {
         email,
         password
       });
 
-      console.log('응답:', response.data); // 예: { token: true }
-
       if (response.data.token) {
-        // 토큰이 실제 토큰이면 localStorage에 저장
-        localStorage.setItem('token', response.data.token);
-        navigate('/home'); // 예시: 로그인 후 이동할 페이지
+        const token = response.data.token;
+        localStorage.setItem('token', token);
+        localStorage.setItem('email', JSON.stringify({ email }));
+        onLogin({ email }); // 상태 즉시 반영
+        navigate('/');
       } else {
         alert('로그인 실패');
       }
@@ -37,15 +37,17 @@ function Login() {
   const handleGoogleLoginSuccess = async (credentialResponse) => {
     try {
       const { credential } = credentialResponse;
-
-      // Google에서 받은 credential(JWT)을 백엔드로 전달
       const response = await axios.post('http://localhost:9090/auth/google', {
         token: credential,
       });
 
       if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        navigate('/home');
+        const token = response.data.token;
+        const emailFromServer = response.data.email; // 백엔드에서 이메일 내려줌
+        localStorage.setItem('token', token);
+        localStorage.setItem('email', JSON.stringify({ email: emailFromServer }));
+        onLogin({ email: emailFromServer }); // 상태 즉시 반영
+        navigate('/');
       } else {
         alert('Google 로그인 실패');
       }

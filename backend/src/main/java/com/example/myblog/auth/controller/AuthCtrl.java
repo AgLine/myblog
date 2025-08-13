@@ -43,19 +43,19 @@ public class AuthCtrl {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
         }
 
-        return ResponseEntity.ok(Map.of("token", token));
+        return ResponseEntity.ok(Map.of("token", token, "email", dto.getEmail()));
     }
 
     @PostMapping("/google")
     public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> body) {
         String idToken = body.get("token");
 
-        String jwt = authSvc.loginWithGoogle(idToken);
+        Map<String, String> result = authSvc.loginWithGoogle(idToken);
         //System.out.println(jwt);
-        if (jwt == null) {
+        if (result == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Google 로그인 실패");
         }
 
-        return ResponseEntity.ok(Map.of("token", jwt));
+        return ResponseEntity.ok(result);
     }
 }

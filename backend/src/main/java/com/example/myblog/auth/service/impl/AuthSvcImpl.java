@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -66,7 +67,7 @@ public class AuthSvcImpl implements AuthSvc, UserDetailsService {
     }
 
     @Override
-    public String loginWithGoogle(String idTokenString) {
+    public Map<String, String> loginWithGoogle(String idTokenString) {
         try {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
                     GoogleNetHttpTransport.newTrustedTransport(),
@@ -99,8 +100,10 @@ public class AuthSvcImpl implements AuthSvc, UserDetailsService {
                 } else {
                     user = userOptional.get();
                 }
+                String token = jwtUtil.generateToken(user.getEmail());
 
-                return jwtUtil.generateToken(user.getEmail());
+                // token + email 함께 반환
+                return Map.of("token", token, "email", email);
             } else {
                 return null;
             }

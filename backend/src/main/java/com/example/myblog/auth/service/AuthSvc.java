@@ -2,6 +2,8 @@ package com.example.myblog.auth.service;
 
 import com.example.myblog.auth.dto.SignupRequestDto;
 
+import java.util.Map;
+
 public interface AuthSvc {
     //회원가입
     public void signup(SignupRequestDto dto);
@@ -10,6 +12,6 @@ public interface AuthSvc {
     //로그인
     public String login(SignupRequestDto dto);
     //구글로그인
-    String loginWithGoogle(String idToken);
+    Map<String, String> loginWithGoogle(String idToken);
 
 }
