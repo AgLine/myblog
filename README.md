@@ -16,13 +16,20 @@
 
 ---
 ## 🛠 주요 기능
-### 1. 인증/인가 시스템
+### 1. 인증/인가 시스템 (완료)
 - JWT 기반 로그인/회원가입
 - Google OAuth2 소셜 로그인
 
-### 2. 게시글
+### 2. 게시글 (진행중)
 - 게시글 CRUD (Markdown 지원)
 
+### 3. AI 글요약 (예정)
+- GPT API 기반 글 요약 및 제목 추천 기능
+
+### 4. 배포 자동화 (진행 중)
+- Spring Boot, React Docker 이미지 빌드 (완료)
+- GitHub Actions + Jenkins CI/CD (학습중)
+- Kubernetes 클러스터에 배포 (예정)
 ---
 ## 📖 배운 점 & 느낀 점
 
