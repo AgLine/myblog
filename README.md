@@ -29,9 +29,8 @@
 
 ---
 ## 📷 실행 화면
-<details>
-<summary>회원가입</summary>
-<div markdown="1">
+### 회원가입
+![회원가입](https://github.com/user-attachments/assets/95d7e134-1ed6-4c08-a9d1-5b921cff9f57)
 
-</div>
-</details>
+### 로그인
+![로그인](https://github.com/user-attachments/assets/f35a6d52-d1ca-45c7-ba91-7aa9ba3b4702)
