@@ -34,3 +34,7 @@
 
 ### 로그인
 ![로그인](https://github.com/user-attachments/assets/f35a6d52-d1ca-45c7-ba91-7aa9ba3b4702)
+
+### 구글로그인
+![구글로그인](https://github.com/user-attachments/assets/df37215e-dcc7-458e-89a4-b38c627559d1)
+
