@@ -8,6 +8,7 @@ import './App.css';
 
 function Header({ user, onLogout }) {
   const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleLoginClick = () => navigate('/login');
   const handleLogoutClick = () => {
@@ -23,10 +24,20 @@ function Header({ user, onLogout }) {
       </div>
       <div className="header-right">
         {user ? (
-          <>
+          <div 
+            className="user-menu"
+            onMouseEnter={() => setIsDropdownOpen(true)}
+            onMouseLeave={() => setIsDropdownOpen(false)}
+          >
             <span className="username">{user.email}님</span>
-            <button className="btn" onClick={handleLogoutClick}>로그아웃</button>
-          </>
+            {isDropdownOpen && (
+              <ul className="dropdown-menu">
+                <li onClick={() => navigate('/mypage')}>마이페이지</li>
+                <li onClick={() => navigate('/write')}>글작성</li>
+                <li onClick={handleLogoutClick}>로그아웃</li>
+              </ul>
+            )}
+          </div>
         ) : (
           <button className="btn" onClick={handleLoginClick}>로그인</button>
         )}

@@ -135,3 +135,40 @@ body {
   border: 1px solid #ccc;
   border-radius: 6px;
 }
+
+.user-menu {
+  position: relative; /* 드롭다운 메뉴의 기준점이 됨 */
+  cursor: pointer;
+}
+
+.username {
+  font-size: 14px;
+  color: #333;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  list-style: none;
+  
+  padding: 8px 0; /* 상하 패딩으로 내부 여백 확보 */
+  margin: 0;      /* 모든 마진 제거 */
+
+  min-width: 120px;
+  z-index: 20;
+}
+
+.dropdown-menu li {
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #333;
+}
+
+.dropdown-menu li:hover {
+  background-color: #f5f5f5;
+}
