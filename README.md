@@ -1,16 +1,47 @@
-# 📝 Brunch-style Blog Platform Clone
-Markdown 기반의 작가 중심 글쓰기 기능과 GPT API를 활용한 자동 요약/제목 추천 기능, 그리고 JWT 인증 및 CI/CD 자동배포까지 구현을 목표로 하고 있습니다.
-## 🔧 Tech Stack
-### Backend
-- **Java 17**, **Spring Boot**
-- **Spring Security + JWT** (인가/인증 분리)
-- **Google OAuth2 Login** (소셜 로그인 연동)
-- **JPA (Hibernate)**, PostgreSQL
-- Swagger (API 문서화)
-- GPT API연동 (글 요약/제목 생성)
+# 📝 브런치 스타일 블로그 플랫폼 클론 (진행중)
+---
+## 📌 프로젝트 개요
+- **기간**: 2025.07 ~ 진행중
+- **Backend**: `Java17`, `Spring Boot 3`, `Spring Security`, `JWT`, `JPA`
+- **Frontend**: `Raect`
+- **Build Tool**: `gradle`
+- **DB**: `PostgreSQL`
+- **IDE**: `IntelliJ`, `DBeaver`, `Docker Desktop`
 
-### DevOps
-- GitHub Actions
-- Jenkins
-- Docker
-- Kubernetes (배포 자동화 구성 중)
+---
+## 🎯 프로젝트 목적
+브런치(Brunch) 플랫폼을 벤치마킹하여, Markdown 기반 글쓰기와 **AI 보조 기능(GPT API를 활용한 자동 요약/제목 추천)** 을 제공하는 블로그 서비스를 구현하는 것을 목표로 합니다.
+
+또한, JWT 인증, 소셜 로그인, CI/CD 자동 배포까지 포함하여 실무와 유사한 서비스 환경을 경험하고자 합니다.
+
+---
+## 🛠 주요 기능
+### 1. 인증/인가 시스템 (완료)
+- JWT 기반 로그인/회원가입
+- Google OAuth2 소셜 로그인
+
+### 2. 게시글 (진행중)
+- 게시글 CRUD (Markdown 지원)
+
+### 3. AI 글요약 (예정)
+- GPT API 기반 글 요약 및 제목 추천 기능
+
+### 4. 배포 자동화 (진행 중)
+- Spring Boot, React Docker 이미지 빌드 (완료)
+- GitHub Actions + Jenkins CI/CD (학습중)
+- Kubernetes 클러스터에 배포 (예정)
+---
+## 📖 배운 점 & 느낀 점
+
+
+---
+## 📷 실행 화면
+### 회원가입
+![회원가입](https://github.com/user-attachments/assets/95d7e134-1ed6-4c08-a9d1-5b921cff9f57)
+
+### 로그인
+![로그인](https://github.com/user-attachments/assets/f35a6d52-d1ca-45c7-ba91-7aa9ba3b4702)
+
+### 구글로그인
+![구글로그인](https://github.com/user-attachments/assets/df37215e-dcc7-458e-89a4-b38c627559d1)
+
