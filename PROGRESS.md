@@ -10,7 +10,15 @@
 ## 2025-08-25
 ### 진행사항
 <img width="595" height="265" alt="image" src="https://github.com/user-attachments/assets/ede0d57b-8a7b-425e-9e8f-11a10f2c46b4" />
+
 - userId API 추가중 SecurityConfig 오류 발생 -> 이전에 겪었던 오류지만 또 발생
 - API는 개발완료
 ### 이후 계획
 - userId API 회원가입에서 테스트할 예정
+
+## 2025-08-26
+### 진행사항
+- userId API 테스트 완료
+- react 글작성페이지 추가
+### 이후 계획
+- 글작성 백엔드개발
