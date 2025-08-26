@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import Login from './Login';
 import SignUp from './SignUp';
 import Home from './Home';
+import Write from './Write';
+
 import './App.css';
 
 function Header({ user, onLogout }) {
@@ -34,6 +36,7 @@ function Header({ user, onLogout }) {
               <ul className="dropdown-menu">
                 <li onClick={() => navigate('/mypage')}>마이페이지</li>
                 <li onClick={() => navigate('/write')}>글작성</li>
+                <li onClick={() => navigate('/tempPost')}>임시글</li>
                 <li onClick={handleLogoutClick}>로그아웃</li>
               </ul>
             )}
@@ -61,6 +64,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login onLogin={setEmail} />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/write" element={<Write />} />
       </Routes>
     </Router>
   );
