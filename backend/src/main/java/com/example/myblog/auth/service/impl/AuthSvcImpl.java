@@ -36,18 +36,24 @@ public class AuthSvcImpl implements AuthSvc, UserDetailsService {
         User user = new User();
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setUserId(dto.getUserId());
         user.setProvider("local");
         userRepository.save(user);
     }
 
     @Override
-    public boolean validateEmail(String email) {
-        return userRepository.findByEmail(email).isPresent();
+    public boolean validateEmail(String email, String provider) {
+        return userRepository.findByEmailAndProvider(email, provider).isPresent();
+    }
+
+    @Override
+    public boolean validateUserId(String userId, String provider) {
+        return userRepository.findByUserIdAndProvider(userId, provider).isPresent();
     }
 
     @Override
     public String login(SignupRequestDto dto) {
-        Optional <User> userOptional = userRepository.findByEmail(dto.getEmail());
+        Optional <User> userOptional = userRepository.findByEmailAndProvider(dto.getEmail(), "local");
         if (userOptional.isEmpty()) {
             return "false"; // 사용자 없음
         }
@@ -60,6 +66,7 @@ public class AuthSvcImpl implements AuthSvc, UserDetailsService {
         return jwtUtil.generateToken(user.getEmail());
     }
 
+    //Spring Security가 토큰을 검증한 후 호출하는 loadUserByUsername 단계에서는 "이 이메일을 가진 사용자가 우리 DB에 있는가? 를 확인하는 메서드
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
@@ -86,13 +93,14 @@ public class AuthSvcImpl implements AuthSvc, UserDetailsService {
                 if (!emailVerified) return null;
 
                 // 이미 있는 유저인지 확인
-                Optional<User> userOptional = userRepository.findByEmail(email);
+                Optional<User> userOptional = userRepository.findByEmailAndProvider(email, "google");
                 User user;
                 if (userOptional.isEmpty()) {
                     // 없으면 자동 회원가입
                     user = new User();
                     user.setEmail(email);
                     user.setPassword(""); // 비밀번호 없음
+                    user.setUserId(email.split("@")[0]);
                     user.setProvider("google");
 
                     //System.out.println(user.getEmail());

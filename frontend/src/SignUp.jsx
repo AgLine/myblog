@@ -9,13 +9,17 @@ function SignUp() {
   const [isEmailChecked, setIsEmailChecked] = useState(false);
   const [isEmailAvailable, setIsEmailAvailable] = useState(null);
 
+  const [userId, setUserId] = useState('');
+  const [isUserIdChecked, setIsUserIdChecked] = useState(false);
+  const [isUserIdAvailable, setIsUserIdAvailable] = useState(null);
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleEmailCheck = async () => {
     try {
       const response = await axios.get(`http://localhost:9090/auth/validateEmail`, {
-      params: { email },
+        params: { email },
       });
       setIsEmailChecked(true);
       setIsEmailAvailable(response.data.available);
@@ -24,27 +28,52 @@ function SignUp() {
     }
   };
 
+  const handleUserIdCheck = async () => {
+    // userId가 비어있는 경우 요청을 보내지 않음
+    if (!userId) {
+        alert('아이디를 입력해주세요.');
+        return;
+    }
+    try {
+      // 실제 백엔드 API 엔드포인트로 수정해야 합니다.
+      const response = await axios.get(`http://localhost:9090/auth/validateUserId`, {
+        params: { userId },
+      });
+      setIsUserIdChecked(true);
+      setIsUserIdAvailable(response.data.available);
+    } catch (error) {
+      console.error('아이디 중복 확인 중 오류:', error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!isEmailAvailable) {
       alert('이메일 중복 확인이 필요하거나 이미 사용 중입니다.');
       return;
     }
+
+    if (!isUserIdAvailable) {
+      alert('아이디 중복 확인이 필요하거나 이미 사용 중입니다.');
+      return;
+    }
+
     if (password !== confirmPassword) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
     }
-   
+
     try {
       const response = await axios.post('http://localhost:9090/auth/signup', {
         email,
-        password
+        userId,
+        password,
       });
       if (response.data === 'success') {
         alert('회원가입 성공!');
         navigate('/Login'); // 로그인 페이지로 이동
-      }else{
+      } else {
         alert('회원가입 실패: ' + response.data);
       }
     } catch (error) {
@@ -52,6 +81,7 @@ function SignUp() {
       console.error(error);
     }
   };
+
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>회원가입</h2>
@@ -83,6 +113,37 @@ function SignUp() {
               }}
             >
               {isEmailAvailable ? '사용 가능한 이메일입니다.' : '이미 사용 중입니다.'}
+            </div>
+          )}
+        </div>
+
+        {/* 아이디 입력 및 중복 확인 */}
+        <div style={styles.fieldWrapper}>
+          <label style={styles.label}>아이디</label>
+          <div style={styles.responsiveRow}>
+            <input
+              type="text"
+              value={userId}
+              onChange={(e) => {
+                setUserId(e.target.value);
+                setIsUserIdChecked(false);
+                setIsUserIdAvailable(null);
+              }}
+              style={styles.input}
+              placeholder="사용할 아이디를 입력하세요"
+              required
+            />
+            <button type="button" onClick={handleUserIdCheck} style={styles.checkButton}>중복 확인</button>
+          </div>
+          {isUserIdChecked && (
+            <div
+              style={{
+                color: isUserIdAvailable ? 'green' : 'red',
+                marginTop: '4px',
+                fontSize: '0.9rem',
+              }}
+            >
+              {isUserIdAvailable ? '사용 가능한 아이디입니다.' : '이미 사용 중인 아이디입니다.'}
             </div>
           )}
         </div>

@@ -28,12 +28,20 @@ public class AuthCtrl {
     @GetMapping("/validateEmail")
     public ResponseEntity<?> validateEmail (@RequestParam String email){
         //System.out.println(email);
-        if(authSvc.validateEmail(email)){
+        if(authSvc.validateEmail(email, "local")){
             return ResponseEntity.ok(Map.of("available", false));
         }
         return ResponseEntity.ok(Map.of("available", true));
     }
 
+    @GetMapping("/validateUserId")
+    public ResponseEntity<?> validateUserId (@RequestParam String userId){
+        //System.out.println(email);
+        if(authSvc.validateUserId(userId, "local")){
+            return ResponseEntity.ok(Map.of("available", false));
+        }
+        return ResponseEntity.ok(Map.of("available", true));
+    }
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody SignupRequestDto dto) {
         //System.out.println(dto.getEmail());
