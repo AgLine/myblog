@@ -1,4 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // 페이지 이동을 위해 import
+
+// 마크다운 변환을 위한 showdown 라이브러리를 사용합니다.
+// 이 라이브러리는 여전히 public/index.html 파일에 추가해주셔야 합니다.
+// <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
 
 const Tag = ({ label, onRemove }) => (
   <div style={styles.tag}>
@@ -14,6 +19,7 @@ function App() {
   const [content, setContent] = useState('');
   const [htmlContent, setHtmlContent] = useState('');
   const [converter, setConverter] = useState(null);
+  const navigate = useNavigate(); // useNavigate 훅 사용
 
   useEffect(() => {
     if (window.showdown) {
@@ -44,16 +50,79 @@ function App() {
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
-  const handleSaveDraft = () => {
-    console.log({ title, tags, content });
-  };
-
-  const handlePublish = () => {
+  // --- '임시저장' API 연동 ---
+  const handleSaveDraft = async () => {
     if (!title.trim() || !content.trim()) {
-      console.log("제목과 내용을 모두 입력해주세요.");
+      alert("제목과 내용을 모두 입력해주세요.");
       return;
     }
-    console.log({ title, tags, content });
+
+    const postData = {
+      title: title,
+      tags: [...tags],
+      content: content,
+      status: "draft"
+    };
+
+    try {
+      const response = await fetch('/api/posts/draft', { // 임시저장용 API 엔드포인트
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // 'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify(postData),
+      });
+
+      if (response.ok) {
+        alert('게시글이 임시 저장되었습니다.');
+        // 임시저장 후에는 페이지 이동 없이 현재 페이지에 머무름
+      } else {
+        alert('임시 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('임시 저장 중 오류 발생:', error);
+      alert('임시 저장 중 오류가 발생했습니다.');
+    }
+  };
+
+  // --- '출판하기' API 연동 ---
+  const handlePublish = async () => {
+    if (!title.trim() || !content.trim()) {
+      alert("제목과 내용을 모두 입력해주세요.");
+      return;
+    }
+
+    const postData = {
+      title: title,
+      tags: [...tags],
+      content: content,
+      status: "PUBLISHED"
+    };
+
+    try {
+      const response = await fetch('http://localhost:9090/post/createPost', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify(postData),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('게시글이 성공적으로 등록되었습니다:', result);
+        alert('게시글이 성공적으로 등록되었습니다.');
+        navigate('/'); // 성공 후 홈으로 이동
+      } else {
+        console.error('게시글 등록에 실패했습니다:', response.statusText);
+        alert('게시글 등록에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('게시글 등록 중 오류가 발생했습니다:', error);
+      alert('게시글 등록 중 오류가 발생했습니다.');
+    }
   };
 
   return (
@@ -131,12 +200,7 @@ function App() {
   );
 }
 
-// 마크다운 변환을 위한 showdown 라이브러리를 사용합니다.
-// 이 라이브러리는 여전히 public/index.html 파일에 추가해주셔야 합니다.
-// <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
-
 // --- 스타일 정의 ---
-// Tailwind CSS 대신 사용할 CSS 스타일을 여기에 객체로 정의합니다.
 const styles = {
   container: {
     backgroundColor: '#f9fafb',
