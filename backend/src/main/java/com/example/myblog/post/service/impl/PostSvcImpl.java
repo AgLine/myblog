@@ -1,15 +1,22 @@
 package com.example.myblog.post.service.impl;
 
-import com.example.myblog.post.entity.Post;
-import com.example.myblog.post.entity.Tag;
 import com.example.myblog.auth.entity.User;
 import com.example.myblog.auth.repository.UserRepository;
-import com.example.myblog.post.repository.TagRepository;
-import com.example.myblog.post.repository.PostRepository;
+import com.example.myblog.common.dto.PageResponseDto;
+import com.example.myblog.post.dto.PostResponseDto;
 import com.example.myblog.post.dto.PostRequestDto;
+import com.example.myblog.post.entity.Post;
+import com.example.myblog.post.entity.PostStatus;
+import com.example.myblog.post.entity.Tag;
+import com.example.myblog.post.repository.PostRepository;
+import com.example.myblog.post.repository.TagRepository;
 import com.example.myblog.post.service.PostSvc;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -57,9 +64,59 @@ public class PostSvcImpl implements PostSvc {
         }
     }
 
+    @Override
+    @Transactional
+    public Long updatePost(Long postId, PostRequestDto requestDto, Long userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다. id=" + postId));
+
+        if (!post.getUser().getId().equals(userId)) {
+            throw new RuntimeException("게시글을 수정할 권한이 없습니다.");
+        }
+
+        Set<Tag> tags = requestDto.getTags().stream()
+                .map(this::findOrCreateTag)
+                .collect(Collectors.toSet());
+
+        post.setTitle(requestDto.getTitle());
+        post.setContent(requestDto.getContent());
+        post.setStatus(requestDto.getStatus());
+        post.getTags().clear();
+        post.getTags().addAll(tags);
+
+        return post.getId();
+    }
+
+    @Override
+    @Transactional
+    public void deletePost(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다. id=" + postId));
+
+        if (!post.getUser().getId().equals(userId)) {
+            throw new RuntimeException("게시글을 삭제할 권한이 없습니다.");
+        }
+
+        post.setStatus(PostStatus.DELETE);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponseDto<PostResponseDto> getPostList(Pageable pageable) {
+        Page<Post> postPage = postRepository.findAllByStatusNot(PostStatus.DELETE, pageable);
+
+        // Page<Post>를 Page<PostListResponseDto>로 변환
+        Page<PostResponseDto> postListDtoPage = postPage.map(PostResponseDto::new);
+
+        // 최종적으로 Page<PostListResponseDto>를 PageResponseDto로 감싸서 반환
+        return new PageResponseDto<>(postListDtoPage);
+    }
+
     // 태그 이름으로 태그를 찾거나, 없으면 새로 생성하는 헬퍼 메서드
     private Tag findOrCreateTag(String tagName) {
         return tagRepository.findByTagName(tagName)
                 .orElseGet(() -> tagRepository.save(new Tag(null, tagName)));
     }
+
+
 }

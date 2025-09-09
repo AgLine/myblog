@@ -41,7 +41,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/signup", "/auth/login", "/auth/validateEmail", "/auth/validateUserId", "/oauth2/**", "auth/google").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/post/createPost").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/posts").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/post/*").authenticated()
                         .anyRequest().authenticated()
                 )
                 /*

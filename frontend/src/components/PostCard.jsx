@@ -5,10 +5,9 @@ function PostCard({ post }) {
   return (
     <div className="post-card">
       <h2 className="post-title">{post.title}</h2>
-      <p className="post-summary">{post.summary}</p>
       <div className="post-footer">
-        <span>{post.author}</span>
-        <span>{post.date}</span>
+        <span>{post.userNickname}</span>
+        <span>{post.updatedAt}</span>
       </div>
     </div>
   );

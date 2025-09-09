@@ -1,7 +1,9 @@
 package com.example.myblog.post.controller;
 
+import com.example.myblog.common.dto.PageResponseDto;
 import com.example.myblog.post.dto.PostRequestDto;
 import com.example.myblog.auth.entity.User;
+import com.example.myblog.post.dto.PostResponseDto;
 import com.example.myblog.post.service.PostSvc;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import java.util.Map;
 
 @Controller
@@ -50,4 +55,38 @@ public class PostCtrl {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
+
+    /**
+     * 게시글 목록 조회 API
+     * 예시: /posts?page=0&size=10&sort
+     */
+    @GetMapping("/posts")
+    public ResponseEntity<PageResponseDto<PostResponseDto>> getPostList(
+            @PageableDefault(size = 10, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        // 반환 타입이 PageResponseDto로 자연스럽게 변경됩니다.
+        PageResponseDto<PostResponseDto> postList = postSvc.getPostList(pageable);
+        return ResponseEntity.ok(postList);
+    }
+
+    /**
+     * 게시글 수정 API
+     */
+    @PutMapping("/post/{postId}")
+    public ResponseEntity<Map<String, String>> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto, @AuthenticationPrincipal User user) {
+        Long updatedPostId = postSvc.updatePost(postId, requestDto, user.getId());
+        Map<String, String> response = Map.of("status", "success", "postId", String.valueOf(updatedPostId));
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 게시글 삭제 API
+     */
+    @DeleteMapping("/post/{postId}")
+    public ResponseEntity<Map<String, String>> deletePost(@PathVariable Long postId, @AuthenticationPrincipal User user) {
+        postSvc.deletePost(postId, user.getId());
+        Map<String, String> response = Map.of("status", "success", "message", "게시글이 성공적으로 삭제되었습니다.");
+        return ResponseEntity.ok(response);
+    }
+
 }
