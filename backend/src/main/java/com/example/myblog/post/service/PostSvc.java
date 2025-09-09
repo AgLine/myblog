@@ -18,4 +18,7 @@ public interface PostSvc {
 
     // 게시글 목록 조회
     PageResponseDto<PostResponseDto> getPostList(Pageable pageable);
+
+    // 게시글 단건 조회
+    PostResponseDto getPost(Long postId);
 }

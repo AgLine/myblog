@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface PostRepository extends JpaRepository<Post, Long> {
     /**
      * N+1 문제 해결을 위해 `JOIN FETCH` 사용
@@ -16,4 +18,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT p FROM Post p JOIN FETCH p.user WHERE p.status <> :status",
             countQuery = "SELECT count(p) FROM Post p WHERE p.status <> :status")
     Page<Post> findAllByStatusNot(@Param("status") PostStatus status, Pageable pageable);
+
+    /**
+     * ✅ 게시글 상세 조회 (N+1 문제 해결을 위해 User, Tags 정보 JOIN FETCH)
+     * ID로 게시글을 조회할 때, 연관된 User와 Tags 정보까지 한 번의 쿼리로 가져옵니다.
+     */
+    @Query("SELECT p FROM Post p JOIN FETCH p.user LEFT JOIN FETCH p.tags WHERE p.id = :id")
+    Optional<Post> findByIdWithUserAndTags(@Param("id") Long id);
 }

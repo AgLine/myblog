@@ -58,7 +58,6 @@ public class PostCtrl {
 
     /**
      * 게시글 목록 조회 API
-     * 예시: /posts?page=0&size=10&sort
      */
     @GetMapping("/posts")
     public ResponseEntity<PageResponseDto<PostResponseDto>> getPostList(
@@ -67,6 +66,14 @@ public class PostCtrl {
         // 반환 타입이 PageResponseDto로 자연스럽게 변경됩니다.
         PageResponseDto<PostResponseDto> postList = postSvc.getPostList(pageable);
         return ResponseEntity.ok(postList);
+    }
+
+    /**
+     * 게시글 단건조회 API
+     */
+    @GetMapping("/post/{postId}")
+    public ResponseEntity<PostResponseDto> getPost(@PathVariable Long postId) {
+        return ResponseEntity.ok(postSvc.getPost(postId));
     }
 
     /**

@@ -112,6 +112,22 @@ public class PostSvcImpl implements PostSvc {
         return new PageResponseDto<>(postListDtoPage);
     }
 
+    @Override
+    @Transactional(readOnly = true) // 데이터 변경이 없는 조회 기능이므로 readOnly = true로 성능 최적화
+    public PostResponseDto getPost(Long postId) {
+        // 1. Repository를 통해 게시글 정보를 한 번에 조회합니다.
+        Post post = postRepository.findByIdWithUserAndTags(postId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 게시글을 찾을 수 없습니다. id=" + postId));
+
+        // 2. 삭제된 게시글인지 확인합니다. (삭제된 글은 보여주지 않음)
+        if (post.getStatus() == PostStatus.DELETE) {
+            throw new IllegalArgumentException("삭제된 게시글입니다.");
+        }
+
+        // 3. 조회된 Post 엔티티를 PostResponseDto로 변환하여 반환합니다.
+        return new PostResponseDto(post);
+    }
+
     // 태그 이름으로 태그를 찾거나, 없으면 새로 생성하는 헬퍼 메서드
     private Tag findOrCreateTag(String tagName) {
         return tagRepository.findByTagName(tagName)
