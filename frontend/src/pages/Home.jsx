@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import PostCard from './components/PostCard';
-import './App.css';
+import PostCard from '../components/PostCard';
+import { Link } from 'react-router-dom';
 
 function Home() {
   // 1. 게시글 데이터를 저장할 state와 로딩/에러 상태를 관리할 state를 만듭니다.
@@ -16,7 +16,6 @@ function Home() {
     const fetchPosts = async () => {
       try {
         // 3. 백엔드 API에 GET 요청을 보냅니다.
-        // 백엔드 주소는 실제 환경에 맞게 수정해야 할 수 있습니다. (예: http://api.myblog.com/posts)
         const response = await axios.get('http://localhost:9090/posts');
         
         // 4. Spring Boot의 Page 객체 응답에서 실제 데이터는 content 배열에 들어있습니다.
@@ -48,9 +47,11 @@ function Home() {
     <div className="container">
       <h1 className="page-title">최신 글</h1>
       <div className="post-grid">
-        {/* 5. 더미 데이터 대신 API로 받아온 posts 배열을 사용합니다. */}
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+          // key는 map으로 렌더링하는 가장 바깥 요소에 있어야 함
+          <Link key={post.id} to={`/post/${post.id}`} className="post-link">
+            <PostCard post={post} />
+          </Link>
         ))}
       </div>
     </div>

@@ -1,10 +1,11 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-import Login from './Login';
-import SignUp from './SignUp';
-import Home from './Home';
-import Write from './Write';
+import Login from './pages/Login';
+import SignUp from './pages/SignUp';
+import Home from './pages/Home';
+import Write from './pages/Write';
+import PostView from './pages/PostView';
 
 import './App.css';
 
@@ -65,6 +66,7 @@ function App() {
         <Route path="/login" element={<Login onLogin={setEmail} />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/write" element={<Write />} />
+        <Route path="/post/:postId" element={<PostView />} />
       </Routes>
     </Router>
   );
