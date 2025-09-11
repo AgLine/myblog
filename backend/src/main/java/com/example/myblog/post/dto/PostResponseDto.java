@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 @Getter
 public class PostResponseDto {
+    private final Long id;
     private final String title;
     private final String content;
     private final List<String> tags;
@@ -20,6 +21,7 @@ public class PostResponseDto {
 
     // Post 엔티티를 받아서 DTO로 변환해주는 생성자
     public PostResponseDto(Post post) {
+        this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
         // Set<Tag>를 List<String>으로 변환
