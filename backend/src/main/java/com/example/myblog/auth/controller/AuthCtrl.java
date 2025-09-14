@@ -46,12 +46,12 @@ public class AuthCtrl {
     public ResponseEntity<?> login(@RequestBody SignupRequestDto dto) {
         //System.out.println(dto.getEmail());
 
-        String token = authSvc.login(dto);
-        if(token.equals("false")){
+        dto = authSvc.login(dto);
+        if(dto.getEmail().equals("false")){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
         }
 
-        return ResponseEntity.ok(Map.of("token", token, "email", dto.getEmail()));
+        return ResponseEntity.ok(Map.of("token", dto.getToken(), "email", dto.getEmail(), "userId", dto.getUserId()));
     }
 
     @PostMapping("/google")

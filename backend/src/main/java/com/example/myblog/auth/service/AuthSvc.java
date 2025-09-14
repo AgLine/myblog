@@ -12,7 +12,7 @@ public interface AuthSvc {
     //userId 중복확인
     public boolean validateUserId(String userId, String provider);
     //로그인
-    public String login(SignupRequestDto dto);
+    public SignupRequestDto login(SignupRequestDto dto);
     //구글로그인
     Map<String, String> loginWithGoogle(String idToken);
 

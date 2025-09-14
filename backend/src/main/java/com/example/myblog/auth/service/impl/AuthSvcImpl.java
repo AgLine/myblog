@@ -52,18 +52,23 @@ public class AuthSvcImpl implements AuthSvc, UserDetailsService {
     }
 
     @Override
-    public String login(SignupRequestDto dto) {
+    public SignupRequestDto login(SignupRequestDto dto) {
         Optional <User> userOptional = userRepository.findByEmailAndProvider(dto.getEmail(), "local");
         if (userOptional.isEmpty()) {
-            return "false"; // 사용자 없음
+            dto.setUserId("fasle");
+            return dto; // 사용자 없음
         }
 
         User user = userOptional.get();
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            return "false"; // 비밀번호 불일치
+            dto.setUserId("fasle");
+            return dto; //비밀번호 불일치
         }
 
-        return jwtUtil.generateToken(user.getEmail());
+        dto.setUserId(user.getUserId());
+        dto.setEmail(user.getEmail());
+        dto.setToken(jwtUtil.generateToken(user.getEmail()));
+        return dto;
     }
 
     //Spring Security가 토큰을 검증한 후 호출하는 loadUserByUsername 단계에서는 "이 이메일을 가진 사용자가 우리 DB에 있는가? 를 확인하는 메서드
