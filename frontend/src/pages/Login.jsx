@@ -21,7 +21,9 @@ function Login({ onLogin }) {
 
       if (response.data.token) {
         const token = response.data.token;
+        const userId = response.data.userId
         localStorage.setItem('token', token);
+        localStorage.setItem('userId', userId);
         localStorage.setItem('email', JSON.stringify({ email }));
         onLogin({ email }); // 상태 즉시 반영
         navigate('/');

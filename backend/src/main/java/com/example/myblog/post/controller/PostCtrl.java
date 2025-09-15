@@ -91,6 +91,7 @@ public class PostCtrl {
      */
     @DeleteMapping("/post/{postId}")
     public ResponseEntity<Map<String, String>> deletePost(@PathVariable Long postId, @AuthenticationPrincipal User user) {
+        System.out.println("삭제삭제삭제");
         postSvc.deletePost(postId, user.getId());
         Map<String, String> response = Map.of("status", "success", "message", "게시글이 성공적으로 삭제되었습니다.");
         return ResponseEntity.ok(response);

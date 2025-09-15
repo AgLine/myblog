@@ -16,7 +16,7 @@ public class PostResponseDto {
     private final String content;
     private final List<String> tags;
     private final PostStatus status;
-    private final String userNickname; // 작성자 닉네임
+    private final String userId;
     private final String updatedAt;    // 최종 수정일
 
     // Post 엔티티를 받아서 DTO로 변환해주는 생성자
@@ -30,7 +30,7 @@ public class PostResponseDto {
                 .collect(Collectors.toList());
         this.status = post.getStatus();
         // 연관된 User 객체의 닉네임 사용
-        this.userNickname = post.getUser().getUserId();
+        this.userId = post.getUser().getUserId();
         // 날짜 형식을 프론트엔드에서 사용하기 쉽게 변환
         this.updatedAt = post.getUpdateDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }

@@ -1,35 +1,88 @@
-// myblog-frontend/src/pages/PostView.js
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios'; // API 통신을 위해 axios를 사용한다고 가정
+import axios from 'axios';
+
+// 스타일 객체를 컴포넌트 내부에 직접 정의
+const styles = {
+    container: {
+        maxWidth: '800px',
+        margin: '40px auto',
+        padding: '20px',
+        fontFamily: 'sans-serif',
+    },
+    title: {
+        fontSize: '2.5rem',
+        fontWeight: '700',
+        marginBottom: '20px',
+    },
+    header: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderBottom: '1px solid #e9ecef',
+        paddingBottom: '15px',
+        marginBottom: '30px',
+    },
+    meta: {
+        fontSize: '0.9rem',
+        color: '#868e96',
+    },
+    metaSpan: {
+        marginLeft: '10px',
+    },
+    actions: {
+        // author-actions
+    },
+    button: {
+        background: 'none',
+        border: '1px solid #868e96',
+        borderRadius: '4px',
+        padding: '4px 8px',
+        fontSize: '0.8rem',
+        color: '#868e96',
+        cursor: 'pointer',
+        marginLeft: '8px',
+    },
+    tagsContainer: {
+        marginBottom: '20px',
+    },
+    tagItem: {
+        display: 'inline-block',
+        backgroundColor: '#f1f3f5',
+        color: '#555',
+        borderRadius: '15px',
+        padding: '5px 12px',
+        marginRight: '10px',
+        fontSize: '0.9rem',
+        fontWeight: '500',
+    },
+    content: {
+        fontSize: '1.1rem',
+        lineHeight: '1.7',
+        color: '#343a40',
+        minHeight: '300px',
+    },
+};
 
 const PostView = () => {
-    // 1. URL 파라미터에서 postId 가져오기
     const { postId } = useParams();
     const navigate = useNavigate();
 
-    // 2. 컴포넌트 상태 관리
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isAuthor, setIsAuthor] = useState(false);
 
     useEffect(() => {
-        // 3. 백엔드로부터 게시글 데이터 가져오기
         const fetchPost = async () => {
             try {
-                // 백엔드 API 엔드포인트에 맞게 수정해야 해
-                const response = await axios.get(`http://localhost:9090/posts/${postId}`);
-                const fetchedPost = response.data.data; // 내 코드를 보니 데이터가 data 객체에 한번 더 감싸여 있더라
+                const response = await axios.get(`http://localhost:9090/post/${postId}`);
+                const fetchedPost = response.data;
                 setPost(fetchedPost);
 
-                // 4. 로그인된 사용자와 작성자 정보 비교
-                // 실제 프로젝트에서는 Context API나 Redux 같은 상태관리 라이브러리를 사용하는 것이 좋아.
-                // 지금은 간단하게 localStorage를 기준으로 할게.
-                const loggedInUserNickname = localStorage.getItem('userNickname');
-
-                if (loggedInUserNickname && loggedInUserNickname === fetchedPost.authorNickname) {
+                // ✅ (중요) localStorage의 userId(문자열)와 게시글의 userId(숫자)를 비교하는 버그 수정
+                const loggedInUserId = localStorage.getItem('userId');
+                if (loggedInUserId === fetchedPost.userId) {
                     setIsAuthor(true);
                 }
 
@@ -42,26 +95,24 @@ const PostView = () => {
         };
 
         fetchPost();
-    }, [postId]); // postId가 바뀔 때마다 다시 데이터를 불러옴
+    }, [postId]);
 
-    // 수정 페이지로 이동하는 함수
     const handleEdit = () => {
-        navigate(`/edit/${postId}`); // 수정 페이지 경로는 프로젝트에 맞게 설정
+        navigate(`/edit/${postId}`);
     };
 
-    // 게시글 삭제 함수 (API 호출 필요)
     const handleDelete = async () => {
         if (window.confirm('정말 이 게시글을 삭제하시겠습니까?')) {
             try {
-                // JWT 토큰을 헤더에 담아서 보내야 인증이 될 거야
-                const token = localStorage.getItem('accessToken');
-                await axios.delete(`/api/posts/${postId}`, {
+                const token = localStorage.getItem('token');
+                console.log("실제로 요청에 담기는 토큰:", `Bearer ${token}`);
+                await axios.delete(`http://localhost:9090/post/${postId}`, { // API 주소 수정
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 });
                 alert('게시글이 삭제되었습니다.');
-                navigate('/'); // 삭제 후 홈으로 이동
+                navigate('/');
             } catch (err) {
                 alert('삭제에 실패했습니다. 권한을 확인해주세요.');
                 console.error(err);
@@ -69,32 +120,36 @@ const PostView = () => {
         }
     };
 
-    // 로딩 및 에러 상태 처리
     if (loading) return <div>로딩 중...</div>;
     if (error) return <div>{error}</div>;
     if (!post) return <div>게시글이 없습니다.</div>;
 
-    // 5. 화면 렌더링
     return (
-        <div className="post-view">
-            <h1>{post.title}</h1>
-            <div className="post-meta">
-                <span>작성자: {post.authorNickname}</span>
-                {/* <span>작성일: {new Date(post.createdAt).toLocaleDateString()}</span> */}
+        <div style={styles.container}>
+            <h1 style={styles.title}>{post.title}</h1>
+
+            <div style={styles.header}>
+                <div style={styles.meta}>
+                    <span>작성자: {post.userId}</span>
+                    <span style={styles.metaSpan}>작성일: {new Date(post.updatedAt).toLocaleDateString()}</span>
+                </div>
+                {isAuthor && (
+                    <div style={styles.actions}>
+                        <button style={styles.button} onClick={handleEdit}>수정</button>
+                        <button style={styles.button} onClick={handleDelete}>삭제</button>
+                    </div>
+                )}
             </div>
 
-            {/* isAuthor가 true일 때만 수정/삭제 버튼을 보여줌 */}
-            {isAuthor && (
-                <div className="author-actions">
-                    <button onClick={handleEdit}>수정</button>
-                    <button onClick={handleDelete}>삭제</button>
-                </div>
-            )}
+            <div style={styles.tagsContainer}>
+                {post.tags && post.tags.map((tag, index) => (
+                    <span key={index} style={styles.tagItem}>
+                        {tag}
+                    </span>
+                ))}
+            </div>
 
-            <hr />
-
-            <div className="post-content">
-                {/* 마크다운 뷰어를 사용한다면 여기에 적용 */}
+            <div style={styles.content}>
                 {post.content}
             </div>
         </div>
