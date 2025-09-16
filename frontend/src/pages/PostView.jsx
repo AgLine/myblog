@@ -105,7 +105,6 @@ const PostView = () => {
         if (window.confirm('정말 이 게시글을 삭제하시겠습니까?')) {
             try {
                 const token = localStorage.getItem('token');
-                console.log("실제로 요청에 담기는 토큰:", `Bearer ${token}`);
                 await axios.delete(`http://localhost:9090/post/${postId}`, { // API 주소 수정
                     headers: {
                         Authorization: `Bearer ${token}`

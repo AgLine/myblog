@@ -15,9 +15,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * N+1 문제 해결을 위해 `JOIN FETCH` 사용
      * 삭제되지 않은 모든 게시글을 페이지네이션과 함께 조회합니다.
      */
-    @Query(value = "SELECT p FROM Post p JOIN FETCH p.user WHERE p.status <> :status",
-            countQuery = "SELECT count(p) FROM Post p WHERE p.status <> :status")
-    Page<Post> findAllByStatusNot(@Param("status") PostStatus status, Pageable pageable);
+    @Query(value = "SELECT p FROM Post p JOIN FETCH p.user WHERE p.status = :status",
+            countQuery = "SELECT count(p) FROM Post p WHERE p.status = :status")
+    Page<Post> findAllByStatus(@Param("status") PostStatus status, Pageable pageable);
 
     /**
      * ✅ 게시글 상세 조회 (N+1 문제 해결을 위해 User, Tags 정보 JOIN FETCH)

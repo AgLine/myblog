@@ -61,21 +61,22 @@ function App() {
       title: title,
       tags: [...tags],
       content: content,
-      status: "draft"
+      status: "DRAFT"
     };
 
     try {
-      const response = await fetch('/api/posts/draft', { // 임시저장용 API 엔드포인트
+      const response = await fetch('http://localhost:9090/post/createPost', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // 'Authorization': 'Bearer ' + localStorage.getItem('token')
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
         },
         body: JSON.stringify(postData),
       });
 
       if (response.ok) {
         alert('게시글이 임시 저장되었습니다.');
+        navigate('/'); // 성공 후 홈으로 이동
         // 임시저장 후에는 페이지 이동 없이 현재 페이지에 머무름
       } else {
         alert('임시 저장에 실패했습니다.');

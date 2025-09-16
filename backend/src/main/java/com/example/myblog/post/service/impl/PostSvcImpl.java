@@ -103,7 +103,7 @@ public class PostSvcImpl implements PostSvc {
     @Override
     @Transactional(readOnly = true)
     public PageResponseDto<PostResponseDto> getPostList(Pageable pageable) {
-        Page<Post> postPage = postRepository.findAllByStatusNot(PostStatus.DELETE, pageable);
+        Page<Post> postPage = postRepository.findAllByStatus(PostStatus.PUBLISHED, pageable);
 
         // Page<Post>를 Page<PostListResponseDto>로 변환
         Page<PostResponseDto> postListDtoPage = postPage.map(PostResponseDto::new);
