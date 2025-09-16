@@ -49,3 +49,7 @@
 ## 2025-09-15
 - SpringSecurity requestMatchers HttpMethod.DELETE 추가
 - Delete 테스트완료
+
+## 2025-09-16
+- 글목록 API 수정 -> status가 PUBLISHED 인거만 조회
+- 임시저장기능 추가
