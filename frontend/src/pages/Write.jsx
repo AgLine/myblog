@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // 페이지 이동을 위해 import
+// 🔔 1. useParams와 useNavigate를 react-router-dom에서 함께 import 합니다.
+import { useNavigate, useParams } from 'react-router-dom';
 
 // 마크다운 변환을 위한 showdown 라이브러리를 사용합니다.
-// 이 라이브러리는 여전히 public/index.html 파일에 추가해주셔야 합니다.
 // <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
 
 const Tag = ({ label, onRemove }) => (
@@ -12,14 +12,22 @@ const Tag = ({ label, onRemove }) => (
   </div>
 );
 
-function App() {
+// 컴포넌트 이름을 App에서 역할에 맞게 WritePage 등으로 변경하는 것이 좋습니다.
+function WritePage() {
+  // 🔔 2. useParams 훅을 사용하여 URL에서 postId를 가져옵니다.
+  // 예: /write/123 -> postId는 "123"이 됩니다.
+  const { postId } = useParams();
+  const navigate = useNavigate();
+
+  // 🔔 3. postId의 존재 여부로 '수정 모드'인지 판별하는 변수를 만듭니다.
+  const isEditMode = !!postId;
+
   const [title, setTitle] = useState('');
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState([]);
   const [content, setContent] = useState('');
   const [htmlContent, setHtmlContent] = useState('');
   const [converter, setConverter] = useState(null);
-  const navigate = useNavigate(); // useNavigate 훅 사용
 
   useEffect(() => {
     if (window.showdown) {
@@ -28,6 +36,38 @@ function App() {
       console.error("Showdown library is not loaded. Please include it in your HTML file.");
     }
   }, []);
+  
+  // 🔔 4. 수정 모드일 때, 기존 게시글 데이터를 불러오는 useEffect를 추가합니다.
+  useEffect(() => {
+    // isEditMode가 true일 때만 실행됩니다.
+    if (isEditMode) {
+      const fetchPost = async () => {
+        try {
+          // 백엔드의 단일 게시글 조회 API를 호출합니다. (엔드포인트는 실제 API에 맞게 수정)
+          const response = await fetch(`http://localhost:9090/post/${postId}`, {
+            headers: {
+              'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+          });
+          if (response.ok) {
+            const postData = await response.json();
+            // 서버에서 받은 데이터로 상태를 업데이트합니다.
+            setTitle(postData.title);
+            setTags(postData.tags || []); // tags가 null일 경우를 대비
+            setContent(postData.content);
+          } else {
+            alert('게시글을 불러오는 데 실패했습니다.');
+            navigate('/'); // 실패 시 홈으로 이동
+          }
+        } catch (error) {
+          console.error('게시글 로딩 중 오류:', error);
+          alert('게시글을 불러오는 중 오류가 발생했습니다.');
+          navigate('/');
+        }
+      };
+      fetchPost();
+    }
+  }, [postId, isEditMode, navigate]); // 의존성 배열에 필요한 값들을 명시합니다.
 
   useEffect(() => {
     if (converter) {
@@ -63,21 +103,40 @@ function App() {
       content: content,
       status: "DRAFT"
     };
-
+    
+    // 🔔 5. 수정 모드와 작성 모드에 따라 다른 API를 호출하도록 로직을 수정합니다.
     try {
-      const response = await fetch('http://localhost:9090/post/createPost', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('token')
-        },
-        body: JSON.stringify(postData),
-      });
+      let response;
+      if (isEditMode) {
+        // 수정 모드: PUT 요청으로 게시글을 업데이트합니다. (엔드포인트는 실제 API에 맞게 수정)
+        response = await fetch(`http://localhost:9090/post/updatePost/${postId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          },
+          body: JSON.stringify(postData),
+        });
+      } else {
+        // 작성 모드: 기존 로직과 동일하게 POST 요청으로 새 글을 생성합니다.
+        response = await fetch('http://localhost:9090/post/createPost', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          },
+          body: JSON.stringify(postData),
+        });
+      }
 
       if (response.ok) {
         alert('게시글이 임시 저장되었습니다.');
-        navigate('/'); // 성공 후 홈으로 이동
-        // 임시저장 후에는 페이지 이동 없이 현재 페이지에 머무름
+        // 수정 모드일 때는 해당 게시글 상세 페이지로, 새 글일 때는 홈으로 이동시킬 수 있습니다.
+        if (isEditMode) {
+          navigate(`/post/${postId}`); 
+        } else {
+          navigate('/'); 
+        }
       } else {
         alert('임시 저장에 실패했습니다.');
       }
@@ -87,7 +146,7 @@ function App() {
     }
   };
 
-  // --- '출판하기' API 연동 ---
+  // --- '출판하기' 또는 '수정하기' API 연동 ---
   const handlePublish = async () => {
     if (!title.trim() || !content.trim()) {
       alert("제목과 내용을 모두 입력해주세요.");
@@ -100,36 +159,56 @@ function App() {
       content: content,
       status: "PUBLISHED"
     };
-
+    
+    // 🔔 6. 출판하기 함수도 수정 모드와 작성 모드를 구분합니다.
     try {
-      const response = await fetch('http://localhost:9090/post/createPost', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('token')
-        },
-        body: JSON.stringify(postData),
-      });
+      let response;
+      if (isEditMode) {
+        // 수정 모드: PUT 요청 (엔드포인트는 실제 API에 맞게 수정)
+        response = await fetch(`http://localhost:9090/post/updatePost/${postId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          },
+          body: JSON.stringify(postData),
+        });
+      } else {
+        // 작성 모드: POST 요청
+        response = await fetch('http://localhost:9090/post/createPost', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          },
+          body: JSON.stringify(postData),
+        });
+      }
 
       if (response.ok) {
         const result = await response.json();
-        console.log('게시글이 성공적으로 등록되었습니다:', result);
-        alert('게시글이 성공적으로 등록되었습니다.');
-        navigate('/'); // 성공 후 홈으로 이동
+        const message = isEditMode ? '게시글이 성공적으로 수정되었습니다.' : '게시글이 성공적으로 등록되었습니다.';
+        alert(message);
+        // 성공 후에는 해당 게시글의 상세 페이지로 이동하는 것이 사용자 경험에 좋습니다.
+        // 새 글일 경우 백엔드에서 반환해주는 ID를 사용하고, 수정 글일 경우 기존 postId를 사용합니다.
+        const targetPostId = isEditMode ? postId : result.id; // 백엔드 응답 형식에 따라 result.id는 조정 필요
+        navigate(`/post/${targetPostId}`);
       } else {
-        console.error('게시글 등록에 실패했습니다:', response.statusText);
-        alert('게시글 등록에 실패했습니다.');
+        const errorText = isEditMode ? '게시글 수정에 실패했습니다.' : '게시글 등록에 실패했습니다.';
+        console.error(errorText, response.statusText);
+        alert(errorText);
       }
     } catch (error) {
-      console.error('게시글 등록 중 오류가 발생했습니다:', error);
-      alert('게시글 등록 중 오류가 발생했습니다.');
+      console.error('게시글 처리 중 오류가 발생했습니다:', error);
+      alert('게시글 처리 중 오류가 발생했습니다.');
     }
   };
 
   return (
     <div style={styles.container}>
       <div style={styles.editorWrapper}>
-        <h1 style={styles.header}>새 글 작성하기</h1>
+        {/* 🔔 7. 페이지 제목(h1)을 isEditMode에 따라 동적으로 변경합니다. */}
+        <h1 style={styles.header}>{isEditMode ? '게시글 수정' : '새 글 작성하기'}</h1>
 
         <div style={styles.section}>
           <label htmlFor="title" style={styles.label}>제목</label>
@@ -193,7 +272,8 @@ function App() {
             onClick={handlePublish}
             style={{ ...styles.button, ...styles.publishButton }}
           >
-            출판하기
+            {/* 🔔 8. 버튼 텍스트도 isEditMode에 따라 동적으로 변경합니다. */}
+            {isEditMode ? '수정하기' : '출판하기'}
           </button>
         </div>
       </div>
@@ -202,6 +282,7 @@ function App() {
 }
 
 // --- 스타일 정의 ---
+// (기존 스타일 코드는 변경 없이 그대로 사용)
 const styles = {
   container: {
     backgroundColor: '#f9fafb',
@@ -326,4 +407,4 @@ const styles = {
   }
 };
 
-export default App;
+export default WritePage;

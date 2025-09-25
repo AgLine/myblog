@@ -98,7 +98,7 @@ const PostView = () => {
     }, [postId]);
 
     const handleEdit = () => {
-        navigate(`/edit/${postId}`);
+        navigate(`/write/${postId}`);
     };
 
     const handleDelete = async () => {

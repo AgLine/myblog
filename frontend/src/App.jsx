@@ -66,6 +66,7 @@ function App() {
         <Route path="/login" element={<Login onLogin={setEmail} />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/write" element={<Write />} />
+        <Route path="/write/:postId" element={<Write />} />
         <Route path="/post/:postId" element={<PostView />} />
       </Routes>
     </Router>
