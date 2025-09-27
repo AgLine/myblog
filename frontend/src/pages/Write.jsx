@@ -165,7 +165,7 @@ function WritePage() {
       let response;
       if (isEditMode) {
         // 수정 모드: PUT 요청 (엔드포인트는 실제 API에 맞게 수정)
-        response = await fetch(`http://localhost:9090/post/updatePost/${postId}`, {
+        response = await fetch(`http://localhost:9090/post/${postId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -186,13 +186,17 @@ function WritePage() {
       }
 
       if (response.ok) {
-        const result = await response.json();
         const message = isEditMode ? '게시글이 성공적으로 수정되었습니다.' : '게시글이 성공적으로 등록되었습니다.';
         alert(message);
-        // 성공 후에는 해당 게시글의 상세 페이지로 이동하는 것이 사용자 경험에 좋습니다.
-        // 새 글일 경우 백엔드에서 반환해주는 ID를 사용하고, 수정 글일 경우 기존 postId를 사용합니다.
-        const targetPostId = isEditMode ? postId : result.id; // 백엔드 응답 형식에 따라 result.id는 조정 필요
-        navigate(`/post/${targetPostId}`);
+
+        // 수정 모드일 경우에만 해당 게시글 상세 페이지로 이동
+        if (isEditMode) {
+          navigate(`/post/${postId}`);
+        } else {
+          // 새 글 작성 후에는 메인 페이지로 이동
+          navigate('/');
+        }
+
       } else {
         const errorText = isEditMode ? '게시글 수정에 실패했습니다.' : '게시글 등록에 실패했습니다.';
         console.error(errorText, response.statusText);
