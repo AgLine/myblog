@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -52,4 +53,9 @@ public class Post extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PostStatus status;
+
+    //조회수
+    @Column(nullable = false)
+    @ColumnDefault("0")
+    private int viewCount;
 }

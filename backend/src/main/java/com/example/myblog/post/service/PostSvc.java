@@ -21,4 +21,7 @@ public interface PostSvc {
 
     // 게시글 단건 조회
     PostResponseDto getPost(Long postId);
+
+    //게시글 조회수 증가
+    void increaseViewCount(Long postId);
 }

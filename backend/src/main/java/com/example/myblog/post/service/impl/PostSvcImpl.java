@@ -134,5 +134,11 @@ public class PostSvcImpl implements PostSvc {
                 .orElseGet(() -> tagRepository.save(new Tag(null, tagName)));
     }
 
+    @Override
+    @Transactional
+    public void increaseViewCount(Long postId) {
+        postRepository.increaseViewCount(postId);
+    }
+
 
 }

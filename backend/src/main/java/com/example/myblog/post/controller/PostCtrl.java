@@ -73,6 +73,7 @@ public class PostCtrl {
      */
     @GetMapping("/post/{postId}")
     public ResponseEntity<PostResponseDto> getPost(@PathVariable Long postId) {
+        postSvc.increaseViewCount(postId);
         return ResponseEntity.ok(postSvc.getPost(postId));
     }
 

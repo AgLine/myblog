@@ -18,6 +18,7 @@ public class PostResponseDto {
     private final PostStatus status;
     private final String userId;
     private final String updatedAt;    // 최종 수정일
+    private final int viewCount;
 
     // Post 엔티티를 받아서 DTO로 변환해주는 생성자
     public PostResponseDto(Post post) {
@@ -33,6 +34,7 @@ public class PostResponseDto {
         this.userId = post.getUser().getUserId();
         // 날짜 형식을 프론트엔드에서 사용하기 쉽게 변환
         this.updatedAt = post.getUpdateDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        this.viewCount = post.getViewCount();
     }
 
 }
