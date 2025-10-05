@@ -19,7 +19,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "\"post\"")
+@Table(name = "post", indexes = @Index(name = "idx_post_update_date", columnList = "updateDate"))
 public class Post extends BaseTimeEntity {
 
     //글ID

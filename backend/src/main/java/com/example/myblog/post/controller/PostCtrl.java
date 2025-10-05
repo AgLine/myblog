@@ -75,13 +75,13 @@ public class PostCtrl {
         // 반환 타입이 PageResponseDto로 자연스럽게 변경됩니다.
         PageResponseDto<PostResponseDto> postList = postSvc.getPostList(pageable);
 
-        //2. 실행 종료 시간 기록
+        // 2. 실행 종료 시간 기록
         long endTime = System.nanoTime();
 
-        // 4. 실행 시간 계산 (나노초 -> 밀리초)
+        // 3. 실행 시간 계산 (나노초 -> 밀리초)
         long duration = (endTime - startTime) / 1_000_000;
 
-        // 5. 로그 출력
+        // 4. 로그 출력
         log.info("getPostList API 실행 시간: {}ms", duration);
 
         return ResponseEntity.ok(postList);
@@ -92,7 +92,21 @@ public class PostCtrl {
      */
     @GetMapping("/post/{postId}")
     public ResponseEntity<PostResponseDto> getPost(@PathVariable Long postId) {
+
+        // 1. 실행 시작 시간 기록
+        long startTime = System.nanoTime();
+
         postSvc.increaseViewCount(postId);
+
+        // 2. 실행 종료 시간 기록
+        long endTime = System.nanoTime();
+
+        // 3. 실행 시간 계산 (나노초 -> 밀리초)
+        long duration = (endTime - startTime) / 1_000_000;
+
+        // 4. 로그 출력
+        log.info("getPostId API 실행 시간: {}ms", duration);
+
         return ResponseEntity.ok(postSvc.getPost(postId));
     }
 
