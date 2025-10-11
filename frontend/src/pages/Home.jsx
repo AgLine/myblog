@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 function Home() {
   // 1. 게시글 데이터를 저장할 state와 로딩/에러 상태를 관리할 state를 만듭니다.
   const [posts, setPosts] = useState([]);
+  const [popularPosts, setPopularPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -45,6 +46,16 @@ function Home() {
 
   return (
     <div className="container">
+      <h1 className="page-title">인기 글</h1>
+      <div className="post-grid">
+        {popularPosts.map((post) => (
+          // key는 map으로 렌더링하는 가장 바깥 요소에 있어야 함
+          <Link key={post.id} to={`/post/${post.id}`} className="post-link">
+            <PostCard post={post} />
+          </Link>
+        ))}
+      </div>
+
       <h1 className="page-title">최신 글</h1>
       <div className="post-grid">
         {posts.map((post) => (
