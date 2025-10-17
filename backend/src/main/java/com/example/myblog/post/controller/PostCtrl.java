@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -129,6 +131,15 @@ public class PostCtrl {
         postSvc.deletePost(postId, user.getId());
         Map<String, String> response = Map.of("status", "success", "message", "게시글이 성공적으로 삭제되었습니다.");
         return ResponseEntity.ok(response);
+    }
+
+    /**
+    * 인기글 조회 API
+    */
+    @GetMapping("/post/popular")
+    public ResponseEntity<List<PostResponseDto>> getPostPopular() {
+        List<PostResponseDto> popular = postSvc.findTop5Posts();
+        return ResponseEntity.ok(popular);
     }
 
 }

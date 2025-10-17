@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -140,5 +141,12 @@ public class PostSvcImpl implements PostSvc {
         postRepository.increaseViewCount(postId);
     }
 
+    @Override
+    public List<PostResponseDto> findTop5Posts() {
+        List<Post> posts = postRepository.findTop5ByOrderByViewCountDesc();
 
+        return posts.stream()
+                .map(PostResponseDto::new)
+                .collect(Collectors.toList());
+    }
 }

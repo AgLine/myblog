@@ -6,6 +6,8 @@ import com.example.myblog.post.dto.PostResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface PostSvc {
     //게시글 생성
     public Long createPost(PostRequestDto requestDto, Long userId);
@@ -24,4 +26,7 @@ public interface PostSvc {
 
     //게시글 조회수 증가
     void increaseViewCount(Long postId);
+
+    // 인기 게시글 조회
+    List <PostResponseDto> findTop5Posts();
 }

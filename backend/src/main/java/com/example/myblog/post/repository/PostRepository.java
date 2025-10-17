@@ -1,5 +1,6 @@
 package com.example.myblog.post.repository;
 
+import com.example.myblog.post.dto.PostResponseDto;
 import com.example.myblog.post.entity.Post;
 import com.example.myblog.post.entity.PostStatus;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -28,9 +30,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findByIdWithUserAndTags(@Param("id") Long id);
 
     /**
-     * redis를 위한 게시글 조회수 증가 쿼리
+     * 게시글 조회수 증가 쿼리
      */
     @Modifying
     @Query("update Post p set p.viewCount = p.viewCount + 1 where p.id = :id")
-    int increaseViewCount(@Param("id") Long id);
+    void increaseViewCount(@Param("id") Long id);
+
+    // 조회수(viewCount)가 높은 순서대로 상위 5개의 게시글을 조회
+    List<Post> findTop5ByOrderByViewCountDesc();
 }
