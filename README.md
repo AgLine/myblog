@@ -48,3 +48,5 @@
 ### 구글로그인
 ![구글로그인](https://github.com/user-attachments/assets/df37215e-dcc7-458e-89a4-b38c627559d1)
 
+### 메인화면
+<img width="1534" height="864" alt="image" src="https://github.com/user-attachments/assets/2a838be1-0ff7-4081-8cff-8fbd93d8c52e" />
