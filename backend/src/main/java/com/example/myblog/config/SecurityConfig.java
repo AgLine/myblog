@@ -42,6 +42,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/signup", "/auth/login", "/auth/validateEmail", "/auth/validateUserId", "/oauth2/**", "auth/google").permitAll()
                         .requestMatchers(HttpMethod.GET, "/posts","/post/**").permitAll()
+                        .requestMatchers(
+                                "/v3/api-docs/**",   // Swagger JSON 데이터
+                                "/swagger-ui/**",    // Swagger UI 화면
+                                "/swagger-ui.html"   // Swagger Redirect
+                        ).permitAll()
                         .requestMatchers(HttpMethod.POST, "/post/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/post/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/post/**").authenticated()
