@@ -19,7 +19,7 @@ function Home() {
         // 3. 백엔드 API에 GET 요청을 보냅니다.
         const [popularRes, latestRes] = await Promise.all([
           axios.get('http://localhost:9090/post/popular'), // 인기글 API
-          axios.get('http://localhost:9090/posts'),         // 최신글 API
+          axios.get('http://localhost:9090/post'),         // 최신글 API
         ]);
         
         // 4. Spring Boot의 Page 객체 응답에서 실제 데이터는 content 배열에 들어있습니다.

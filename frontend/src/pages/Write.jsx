@@ -119,7 +119,7 @@ function WritePage() {
         });
       } else {
         // 작성 모드: 기존 로직과 동일하게 POST 요청으로 새 글을 생성합니다.
-        response = await fetch('http://localhost:9090/post/createPost', {
+        response = await fetch('http://localhost:9090/post/post', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -175,7 +175,7 @@ function WritePage() {
         });
       } else {
         // 작성 모드: POST 요청
-        response = await fetch('http://localhost:9090/post/createPost', {
+        response = await fetch('http://localhost:9090/post/post', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

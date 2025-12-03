@@ -6,6 +6,8 @@ import com.example.myblog.auth.entity.User;
 import com.example.myblog.post.dto.PostResponseDto;
 import com.example.myblog.post.service.PostSvc;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +26,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+@Tag(name = "게시글 API", description = "게시글 작성, 조회, 수정, 삭제")
 @Controller
 public class PostCtrl {
 
@@ -39,7 +41,8 @@ public class PostCtrl {
      * @param user JWT 토큰을 통해 인증된 사용자 정보
      * @return 생성된 게시글의 ID를 포함한 응답
      */
-    @PostMapping("/post/createPost")
+    @Operation(summary = "게시글 작성", description = "새로운 게시글을 등록합니다.")
+    @PostMapping("/post")
     public ResponseEntity<Map<String, String>> createPost(@RequestBody PostRequestDto requestDto, @AuthenticationPrincipal User user) {
         /*
         System.out.println("제목 : "+requestDto.getTitle());
@@ -67,10 +70,12 @@ public class PostCtrl {
     /**
      * 게시글 목록 조회 API
      */
-    @GetMapping("/posts")
+    @Operation(summary = "게시글 목록 조회", description = "모든 게시글을 조회합니다.")
+    @GetMapping("/post")
     public ResponseEntity<PageResponseDto<PostResponseDto>> getPostList(
             @PageableDefault(size = 10, sort = "updateDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
+        log.info("getPostList start");
         // 1. 실행 시작 시간 기록
         long startTime = System.nanoTime();
 
@@ -92,6 +97,7 @@ public class PostCtrl {
     /**
      * 게시글 단건조회 API
      */
+    @Operation(summary = "게시글 상세 조회")
     @GetMapping("/post/{postId}")
     public ResponseEntity<PostResponseDto> getPost(@PathVariable Long postId) {
 
@@ -115,6 +121,7 @@ public class PostCtrl {
     /**
      * 게시글 수정 API
      */
+    @Operation(summary = "게시글 수정")
     @PutMapping("/post/{postId}")
     public ResponseEntity<Map<String, String>> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto requestDto, @AuthenticationPrincipal User user) {
         Long updatedPostId = postSvc.updatePost(postId, requestDto, user.getId());
@@ -125,6 +132,7 @@ public class PostCtrl {
     /**
      * 게시글 삭제 API
      */
+    @Operation(summary = "게시글 삭제")
     @DeleteMapping("/post/{postId}")
     public ResponseEntity<Map<String, String>> deletePost(@PathVariable Long postId, @AuthenticationPrincipal User user) {
         System.out.println("삭제삭제삭제");
@@ -136,9 +144,23 @@ public class PostCtrl {
     /**
     * 인기글 조회 API
     */
+    @Operation(summary = "인기글 조회")
     @GetMapping("/post/popular")
     public ResponseEntity<List<PostResponseDto>> getPostPopular() {
+        log.info("getPostPopular start");
+        // 1. 실행 시작 시간 기록
+        long startTime = System.nanoTime();
+
         List<PostResponseDto> popular = postSvc.findTop5Posts();
+
+        // 2. 실행 종료 시간 기록
+        long endTime = System.nanoTime();
+
+        // 3. 실행 시간 계산 (나노초 -> 밀리초)
+        long duration = (endTime - startTime) / 1_000_000;
+
+        // 4. 로그 출력
+        log.info("getPostPopular API 실행 시간: {}ms", duration);
         return ResponseEntity.ok(popular);
     }
 
